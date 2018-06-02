@@ -22,6 +22,32 @@ bool DoesFileExist(char *path) {
 }
 
 int main(int argc, char *argv[]) {
+
+	bool salir = true;
+	int opcion;
+	string path_in, path_out;
+
+	system("cls");
+	cout << "-------Menu Principal------" << endl << endl << endl;
+	cout << "1. Compresor " << endl;
+	cout << "2. Decompresor " << endl;
+	cout << "Digite una opcion: ";
+	cin >> opcion;
+
+	cout << "Digite el path de entrada: ";
+	cin >> path_in;
+
+	cout << "Digite el path de salida: ";
+	cin >> path_out;
+
+	auto a = to_string(opcion);
+	auto b = path_in.c_str();
+	auto c = path_out.c_str();
+
+	argv[1] = a.c_str();
+		argv[2] = b;
+		argv[3] = c;
+
     if (argc != 4 || (strcmp(argv[1], "-c") && strcmp(argv[1], "-x"))) {
         cout << "\nUsage:\n\n"
              << "-c for creating a compressed file\n\t"
