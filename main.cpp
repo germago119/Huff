@@ -1,320 +1,134 @@
-/* 
+// Patrick Sheehan
 
-
-Test program for HuffmanCoding Class
-This program uses both command line and
-manual on-screen inputs
-
-Copyright (C) 2007 , Alireza Noori
-All rights reserved.
-
-
-*/
-
-
-///////////// Header Files /////////////////
-#include "HuffmanCoding.h"
-
-#include <string>
-using std::string;
-
-#include <windows.h>
-
-#include <stdexcept> // stdexcept header file contains runtime_error 
-using std::runtime_error; // standard C++ library class runtime_error
-
+#include "huff.h"
 #include <iostream>
-
-using namespace std;
-
-#include <ostream>
-
-using std::cout;
-using std::cin;
-using std::endl;
-using std::flush;
-using std::cerr;
-
-#include <conio.h>
-
 #include <cstring>
-#include <ctime>
 
-#include <string>
-using std::string;
+void compress();
 
-void manual(); //manual operations
-void help(); //print help for command line
+void putOut();
 
-void RandomTransmission();
-void HorizontalTransmission();
-void VerticalTransmission();
+void decompress();
 
-int gotoxy(int x, int y);
-void sleep( clock_t wait );
+Node *constructHeap();
 
-int compress(string in, string out); //compress in to out
-int decompress(string in, string out); //decompress in to out
+unsigned int frequencies[256] = {0};
+string codebook[256];
 
-//set array of function-pointers to perform random transmissions
-void (*functions[3])(void) = {RandomTransmission,
-                            HorizontalTransmission,
-                            VerticalTransmission};
-
-//main function checks arguments and if they are true
-// or no argument is entered uses the methods
-int main(int argc, char **argv)
-{
-    srand((unsigned int)time(0));
-    if( (argc < 3) || (argc > 4) ) //check arguments count
-    {
-        (*functions[rand() % 3])(); //run random transmission
-        system("CLS");
-        cout << "Invalid command line! To use program with manual "
-            << "settings press ENTER,\notherwise press any other key "
-            << "to see the command line help.";
-        char ch;
-        ch = _getch();
-
-        if(ch == 13)
-        {
-            manual();
-            return 0;
-        }
-
-        (*functions[rand() % 3])(); //run random transmission
-        system("CLS");
-        help();
-        return 0;
-    }
-
-    HuffmanCoding hc;
-    if(argc == 4) //if there are 3 arguments
-    {
-        string tmp(argv[3]);
-        if( (tmp == "/D") ||  //check the last argument
-            (tmp == "/d") )
-        {
-            decompress(argv[1],argv[2]); //goot to decompress
-        }
-        else //incorrect argument
-        {
-            cerr << "Error: 3rd argument is optional and "
-                << "only can be \"/d\"";
-            return 1;
-        }
-    }
-    else
-        compress(argv[1],argv[2]); //the last chance is compress
-}
-
-//manual input
-void manual()
-{
-    char ch;
-    do //as many times as user wants to do this
-    {
-        (*functions[rand() % 3])(); //run random transmission
-        system("CLS");
-        cout << "Welcome to Alireza Noori's Huffman "
-            << "compression/decompression program.\n"
-            << "copyright (C) 2007\n"
-            << "Pick a task to begin...\n\n"
-            << "    1.Compress a file.\n"
-            << "    2.Decompress a file.\n"
-            << "\nPress the related key. " << flush;
-
-        do
-        {
-            ch = _getch();
-        }while( (ch < '1') || (ch > '2') ); //only 1 and 2
-
-        string input,output;
-
-        (*functions[rand() % 3])(); //run random transmission
-        system("CLS");
-        cout << "Enter the input file's path:\n";
-        getline(cin,input);
-
-        cout << "\nEnter the output file's path:\n";
-        getline(cin,output);
-
-        (*functions[rand() % 3])(); //run random transmission
-        system("CLS");
-
-        if(ch == '1')
-            compress(input,output);
-        else
-            decompress(input,output);
-
-        cout << "\nDo you want to do other operation? (y/n)";
-
-        do
-        {
-            ch = _getch();
-        }while( (ch != 'y') && (ch != 'Y') 
-            && (ch != 'n' ) && (ch != 'N') );
-
-    } while ( (ch != 'n' ) && (ch != 'N') ); //check the answer
-}
-
-//print command line help
-void help()
-{
-    system("CLS");
-    cout << "Command line:\n"
-        << "Huffman.EXE (input file) (output file) [/d]\n"
-        << "Note:/d - means decompress input file to output file" << endl;
-}
-
-//compress using HuffmanCoding
-int compress(string in, string out)
-{
-    cout << "Compressing " << in << " :\n";
-    HuffmanCoding hc;
-    try
-    {
-        hc.compress(in,out);
-    }
-    catch( runtime_error pro )
-    {
-        cerr << pro.what();
-        return 1;
-    }
+int main(int argc, char *argv[]) {
+    if (argc == 2) {
+        if ((argv[1][0] == '-') && (argv[1][1] == 'd'))
+            decompress();
+    } else
+        compress();
     return 0;
 }
 
-//decompress using HuffmanCoding
-int decompress(string in, string out)
-{
-    cout << "Decompressing " << in << " :\n";
-    HuffmanCoding hc;
-    try
-    {
-        hc.decompress(in,out);
-    }
-    catch( runtime_error pro )
-    {
-        cerr << pro.what();
-        return 1;
-    }
-    return 0;
+void compress() {
+    unsigned char nextChar;
+    // first, calculate the frequencies of each character
+    cin >> noskipws;
+    while (cin >> nextChar)
+        frequencies[nextChar]++;
+
+
+    Node *root = constructHeap();
+    string code;
+    root->fillCodebook(codebook, code);
+
+    putOut();
 }
 
-//print random '*' then print random ' '
-void RandomTransmission()
-{
-    system("CLS");
-    int i,j;
-    for(i = 0; i < 80; i++)
-    {
-        for(j = 0; j < 25; j++)
-        {
-            gotoxy(rand() % 80, rand() % 25);
-            cout << "*";
+void putOut() {
+    cout << "HUFFMA3" << '\0';
+
+    unsigned int i;
+    for (i = 0; i < 256; i++) {
+        cout << (char) (0x000000ff & frequencies[i]);
+        cout << (char) ((0x0000ff00 & frequencies[i]) >> 8);
+        cout << (char) ((0x00ff0000 & frequencies[i]) >> 16);
+        cout << (char) ((0xff000000 & frequencies[i]) >> 24);
+    }
+
+    unsigned char nextChar;
+    char nextByte = 0;
+    int bitCounter = 0;
+
+    cin.clear();
+    cin.seekg(0);
+    cin >> noskipws;
+    while (cin >> nextChar) {
+        for (i = 0; i < codebook[nextChar].size(); i++, bitCounter++) {
+            if (bitCounter == 8) {
+                cout << nextByte;
+                nextByte = 0;
+                bitCounter = 0;
+            }
+            if (codebook[nextChar][i] == '1')
+                nextByte = nextByte | (0x01 << bitCounter);
         }
-        sleep( (clock_t)3 );
+    }
+    if (bitCounter)
+        cout << nextByte;
+}
+
+void decompress() {
+    cin >> noskipws;
+    char magic[8];
+    cin.read(magic, 8);
+    char nextByte;
+    for (int i = 0; i < 256; i++) {
+        cin.read((char *) &frequencies[i], 4);
     }
 
-    for(i = 0; i < 80; i++)
-    {
-        for(j = 0; j < 25; j++)
-        {
-            gotoxy(rand() % 80, rand() % 25);
-            cout << " ";
+    Node *root = constructHeap();
+    string code;
+    root->fillCodebook(codebook, code);
+
+    while (cin >> nextByte) {
+        for (int i = 0; i < 8; i++) {
+            if ((nextByte >> i) & 0x01)
+                code += '1';
+            else
+                code += '0';
+            for (int i = 0; i < 256; i++) {
+                if (codebook[i] == code) {
+                    if (frequencies[i]) {
+                        cout << (unsigned char) i;
+                        code.clear();
+                        frequencies[i]--;
+                        break;
+                    } else
+                        return;
+                }
+            } // for
         }
-        sleep( (clock_t)3 );
     }
+
+
 }
 
-//print horizontal '*' then print horizontal ' '
-void HorizontalTransmission()
-{
-    system("CLS");
-    int i,j;
-    for(i = 0; i < 80; i++)
-    {
-        for(j = 0; j < 25; j++)
-        {
-            gotoxy(i,j);
-            cout << "*";
+Node *constructHeap() {
+    Heap minHeap;
+    Node *nextNode;
+    for (int i = 0; i < 256; i++) {
+        if (frequencies[i]) {
+            nextNode = new Node(i, frequencies[i]);
+            minHeap.push(nextNode);
         }
-        sleep( (clock_t)2 );
     }
 
-    gotoxy(1,1);
-
-    for(i = 0; i < 80; i++)
-    {
-        for(j = 0; j < 25; j++)
-        {
-            gotoxy(i,j);
-            cout << " ";
-        }
-        sleep( (clock_t)2 );
-    }
-}
-
-//print vertical '*' then print vertical ' '
-void VerticalTransmission()
-{
-    system("CLS");
-    int i,j;
-    for(i = 0; i < 25; i++)
-    {
-        for(j = 0; j < 80; j++)
-            cout << "*";
-        sleep( (clock_t)2 );
+    Node *node1;
+    Node *node2;
+    Node *merged;
+    while (minHeap.size() > 1) {
+        node1 = minHeap.top();
+        minHeap.pop();
+        node2 = minHeap.top();
+        minHeap.pop();
+        merged = new Node(node1, node2);
+        minHeap.push(merged);
     }
 
-    gotoxy(1,1);
-
-    for(i = 0; i < 25; i++)
-    {
-        for(j = 0; j < 80; j++)
-            cout << " ";
-        sleep( (clock_t)2 );
-    }
+    return minHeap.top();
 }
-
-// Pauses for a specified number of milliseconds.
-void sleep( clock_t wait )
-{
-   clock_t goal;
-   goal = wait + clock();
-   while( goal > clock() )
-      ;
-}
-
-//go to x and y positions
-int gotoxy(int x, int y){
-
-    HANDLE myHandle;
-    BOOL successfull;
-
-    COORD coordination;
-    coordination.X=x;
-    coordination.Y=y;
-
-    myHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    if (myHandle==INVALID_HANDLE_VALUE)
-        return -1;
-    successfull = SetConsoleCursorPosition(myHandle, coordination);
-
-    if(!successfull)
-        return -1;
-    
-    return 1;
-}
-
-/***************************************************************************\
-|                                                                           |
-|                                                                           |
-|                                                                           |
-|                             Alireza Noori �                               |
-|                                                                           |
-|                                                                           |
-|                                                                           |
-|                                                                           |
-\***************************************************************************/

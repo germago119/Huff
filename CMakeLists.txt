@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.1)
 project(Huff)
 
-set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD 11)
 
-add_executable(Huff main.cpp heap.cpp heap.h HuffmanCoding.cpp HuffmanCoding.h  mergingTree.cpp  mergingTree.h mergingTreeNode.h mergingType.h)
+add_executable(Huff main.cpp huff.cpp huff.h)
