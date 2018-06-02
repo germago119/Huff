@@ -22,24 +22,30 @@ bool DoesFileExist(char *path) {
 
 int main() {
 
-	int opcion;
-    char *path_in = nullptr;
-    char *path_out = nullptr;
+    int opcion;
+    string in;
+    string out;
 
-	system("cls");
-	cout << "-------Menu Principal------" << endl << endl << endl;
-	cout << "1. Compresor " << endl;
-	cout << "2. Decompresor " << endl;
-	cout << "Digite una opcion: ";
-	cin >> opcion;
+    system("cls");
+    cout << "-------Menu Principal------" << endl << endl << endl;
+    cout << "1. Compresor " << endl;
+    cout << "2. Decompresor " << endl;
+    cout << "Digite una opcion: ";
+    cin >> opcion;
 
-	cout << "Digite el path de entrada: ";
-	cin >> path_in;
+    cout << "Digite el path de entrada: ";
+    cin >> in;
 
-	cout << "Digite el path de salida: ";
-	cin >> path_out;
+    cout << "Digite el path de salida: ";
+    cin >> out;
 
     string a = to_string(opcion);
+
+
+    char *path_in = const_cast<char *>(in.c_str());
+
+    char *path_out = const_cast<char *>(out.c_str());
+
 
     string b{"1"};
     string c{"2"};
