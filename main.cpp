@@ -16,11 +16,34 @@ unsigned int frequencies[256] = {0};
 string codebook[256];
 
 int main(int argc, char *argv[]) {
-    if (argc == 2) {
+	bool salir = false;
+	int opcion = 0;
+
+	while (salir) {
+		system("cls");
+		cout << "-------Menu Principal------" << endl << endl << endl;
+		cout << "1. Comprimir" << endl;
+		cout << "2. Descomprimir" << endl;
+		cout << "Digite una opcion: ";
+		cin >> opcion;
+
+		switch (opcion) {
+		case 1:
+			compress();
+			system("pause");
+			break;
+		case 2:
+			decompress();
+			system("pause");
+			break;
+		}
+	}
+
+   /* if (argc == 2) {
         if ((argv[1][0] == '-') && (argv[1][1] == 'd'))
             decompress();
     } else
-        compress();
+        compress(); */
     return 0;
 }
 
